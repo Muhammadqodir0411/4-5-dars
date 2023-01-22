@@ -1,5 +1,14 @@
 "use strict";
-movies.splice(100);
+
+movies.splice(500);
+
+
+let token = localStorage.getItem("token")
+if(!token){
+    location.replace("login.html")
+}
+
+let page = 1
 
 
 // --- NORMALIZE ALL MOVIES ---//
@@ -22,10 +31,12 @@ const AllMovies = movies.map((movies) => {
 
 // --- RENDER ALL MOVIES FUNCTION --- //
 
-function renderAllMovies() {
+function renderAllMovies(AllMovies) {
+    $('.wrapper').innerHTML = null
     AllMovies.forEach((el) => {
         const card = document.createElement('div');
         card.classList.add('card');
+
         card.innerHTML = `  
         
         <img src="${el.minImg}" alt="img" class="card-img">
@@ -51,20 +62,17 @@ function renderAllMovies() {
     })
 }
 
-renderAllMovies()
+renderAllMovies(AllMovies.slice((page-1)*10 , page*10))
 
 
 // --- FIND FILM FUNCTION --- //
 
 const findFilm = (regexp) => {
-    console.log(regexp);
     return AllMovies.filter((film) => {
         return film.title.match(regexp);
     });
 
 }
-
-console.log(findFilm())
 
 
 $('#submitForm').addEventListener('submit', () => {
@@ -202,24 +210,23 @@ $(".wrapper").addEventListener("click", (e) => {
     }
 });
 
-
+const bookmark = [];
+ 
 function addBookmark(ID) {
+  
+   const filmItem = AllMovies.filter((e) => {
+      return e.id == ID;
+   });
 
-    const bookmark = JSON.parse(localStorage.getItem("bookmark"));
+ 
+   if(!bookmark.includes(filmItem[0])){
+      bookmark.push(filmItem[0])
+   }else{
+      alert('oldin qo\'shilgan')
+   }
 
-    const filmItem = AllMovies.filter((e) => {
-        return e.id == ID;
-    });
-
-
-    if (!bookmark.includes(filmItem[0])) {
-        bookmark.push(filmItem[0])
-    } else {
-        alert('oldin qo\'shilgan')
-    }
-
-    localStorage.setItem('bookmark', JSON.stringify(bookmark));
-    renderBookmark(bookmark);
+   localStorage.setItem('bookmark', JSON.stringify(bookmark));
+   renderBookmark(bookmark);
 }
 
 
@@ -242,9 +249,10 @@ function renderBookmark(bookmarks) {
     })
 }
 
-$(".bookmark").addEventListener("click", e=> {
+$(".bookmark").addEventListener("click", e => {
+    
     let bookmarks = JSON.parse(localStorage.getItem("bookmark"));
-    bookmarks = bookmarks.filter(el => el.id  !=e.target.id);
+    bookmarks = bookmarks.filter(el => el.id != e.target.id);
     localStorage.setItem('bookmark', JSON.stringify(bookmarks));
     renderBookmark(bookmarks);
 })
@@ -252,3 +260,28 @@ $(".bookmark").addEventListener("click", e=> {
 let bookmarks = JSON.parse(localStorage.getItem("bookmark"));
 
 renderBookmark(bookmarks);
+
+$(".page-btns").addEventListener("click", function(e){
+    page = e.target.textContent*1
+    renderAllMovies(AllMovies.slice((page-1)*10 , page*10))
+    renderBtn(movies)
+})
+
+
+function renderBtn(movies){
+    $(".page-btns").innerHTML = null
+    for(let i = 1; i <= Math.ceil(movies.length/10); i++){
+        const btn = document.createElement("button")
+        btn.classList.add("btn","btn-primary")
+        btn.textContent = i
+
+        if(i == page){
+            btn.classList.add("btn-success")
+        }else{
+            btn.classList.remove("btn-success")
+        }
+        $(".page-btns").appendChild(btn)
+    }
+}
+
+renderBtn(movies)
