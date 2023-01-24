@@ -5,6 +5,12 @@
     scroll-behavior: smooth;
 }
 
+.form-logo {
+    width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .logo-body {
     background-image: url(../img/Login.jpg);
 }
